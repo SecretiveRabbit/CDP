@@ -15,19 +15,19 @@ provider "aws" {
 
 #-------------------------------------------vpc,acl and subnets--------------------------------------
 resource "aws_vpc" "VPC_1" {
-  cidr_block = "10.0.0.0/16"
+  cidr_block       = "10.0.0.0/16"
   instance_tenancy = "default"
 }
 
 resource "aws_subnet" "Public_subnet_1" {
-  vpc_id = aws_vpc.VPC_1.id
-  cidr_block = "10.0.1.0/24"
+  vpc_id            = aws_vpc.VPC_1.id
+  cidr_block        = "10.0.1.0/24"
   availability_zone = "us-east-1a"
 }
 
 resource "aws_subnet" "Private_subnet_1" {
-  vpc_id = aws_vpc.VPC_1.id
-  cidr_block = "10.0.2.0/24"
+  vpc_id            = aws_vpc.VPC_1.id
+  cidr_block        = "10.0.2.0/24"
   availability_zone = "us-east-1b"
 }
 
@@ -36,7 +36,7 @@ resource "aws_network_acl" "ACL_1" {
 
   egress {
     protocol   = "tcp"
-    rule_no    = 200  # ?????
+    rule_no    = 200 # ?????
     action     = "allow"
     cidr_block = "10.3.0.0/18"
     from_port  = 443
@@ -45,9 +45,9 @@ resource "aws_network_acl" "ACL_1" {
 
   ingress {
     protocol   = "tcp"
-    rule_no    = 100   # ?????
+    rule_no    = 100 # ?????
     action     = "allow"
-    cidr_block = "10.3.0.0/18"  # ?????
+    cidr_block = "10.3.0.0/18" # ?????
     from_port  = 80
     to_port    = 80
   }
@@ -58,19 +58,19 @@ resource "aws_network_acl" "ACL_1" {
 }
 
 resource "aws_vpc" "VPC_2" {
-  cidr_block = "10.1.0.0/16"
+  cidr_block       = "10.1.0.0/16"
   instance_tenancy = "default"
 }
 
 resource "aws_subnet" "Public_subnet_2" {
-  vpc_id = aws_vpc.VPC_2.id
-  cidr_block = "10.1.1.0/24"
+  vpc_id            = aws_vpc.VPC_2.id
+  cidr_block        = "10.1.1.0/24"
   availability_zone = "us-east-1c"
 }
 
 resource "aws_subnet" "Private_subnet_2" {
-  vpc_id = aws_vpc.VPC_2.id
-  cidr_block = "10.1.2.0/24"
+  vpc_id            = aws_vpc.VPC_2.id
+  cidr_block        = "10.1.2.0/24"
   availability_zone = "us-east-1d"
 }
 
@@ -83,7 +83,7 @@ resource "aws_subnet" "Private_subnet_2" {
 #----------------------------------------instance--------------------------------------------------
 
 resource "aws_security_group" "sg_1" {
-  name = "sg_1"
+  name   = "sg_1"
   vpc_id = aws_vpc.VPC_1.id
 
   ingress {
@@ -105,8 +105,8 @@ resource "aws_network_interface" "foo" {
   }
 }
 
-resource "aws_instance" "ec2_server" {   # 1.2.3.4...?
-  count = 4
+resource "aws_instance" "ec2_server" { # 1.2.3.4...?
+  count         = 4
   ami           = "ami-08d70e59c07c61a3a"
   instance_type = "t2.micro"
 

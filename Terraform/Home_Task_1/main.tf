@@ -187,11 +187,15 @@ resource "aws_key_pair" "webserver-key" {
   public_key = file("~/.ssh/id_rsa.pub")
 }
 */
+resource "aws_key_pair" "MyKeyPair" {
+  key_name   = "webserver-key"
+  public_key = file("${path.module}/id_rsa.pub")
+}
 
 resource "aws_instance" "webserver_public_1" {
   ami                         = "ami-05fa00d4c63e32376"
   instance_type               = "t2.micro"
- # key_name                    = aws_key_pair.webserver-key.key_name
+  key_name                    = aws_key_pair.MyKeyPair.key_name
   associate_public_ip_address = true
   vpc_security_group_ids      = [aws_security_group.sg_public.id]
   subnet_id                   = aws_subnet.Public_subnet_1.id
@@ -204,7 +208,7 @@ resource "aws_instance" "webserver_public_1" {
     connection {
       type        = "ssh"
       user        = "ec2-user"
-  #    private_key = file("~/.ssh/id_rsa")
+      private_key = "${file("${path.module}/id_rsa.pub")}"
       host        = self.public_ip
     }
   }
@@ -216,7 +220,7 @@ resource "aws_instance" "webserver_public_1" {
 resource "aws_instance" "webserver_private_1" {
   ami                         = "ami-05fa00d4c63e32376"
   instance_type               = "t2.micro"
- # key_name                    = aws_key_pair.webserver-key.key_name
+  key_name                    = aws_key_pair.MyKeyPair.key_name
   associate_public_ip_address = true
   vpc_security_group_ids      = [aws_security_group.sg_private.id]
   subnet_id                   = aws_subnet.Private_subnet_1.id
@@ -229,7 +233,8 @@ resource "aws_instance" "webserver_private_1" {
     connection {
       type        = "ssh"
       user        = "ec2-user"
-  #    private_key = file("~/.ssh/id_rsa")
+      #private_key = file("${path.module}/id_rsa.pub")
+      private_key = "${file("${path.module}/id_rsa.pub")}"
       host        = self.public_ip
     }
   }

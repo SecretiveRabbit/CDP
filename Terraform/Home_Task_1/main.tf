@@ -77,7 +77,7 @@ resource "aws_network_acl" "ACL_1" {
 }
 
 resource "aws_security_group" "sg_public" {
-  name   = "sg_1"
+  name   = "sg_pub_1"
   vpc_id = aws_vpc.VPC_1.id
 
   ingress {
@@ -94,6 +94,13 @@ resource "aws_security_group" "sg_public" {
     to_port     = 80
   }
 
+  ingress {
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    from_port   = 1256
+    to_port     = 1256
+  }
+
   egress {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
@@ -104,7 +111,7 @@ resource "aws_security_group" "sg_public" {
 }
 
 resource "aws_security_group" "sg_private" {
-  name   = "sg_2"
+  name   = "sg_priv_2"
   vpc_id = aws_vpc.VPC_1.id
 
   ingress {
@@ -165,7 +172,7 @@ resource "aws_instance" "webserver_private_1" {
   subnet_id              = aws_subnet.Private_subnet_1.id
 
   tags = {
-    Name = "private_server"
+    Name = "private_server_1"
   }
 }
 
@@ -208,7 +215,7 @@ resource "aws_route_table_association" "RT_for_private" {
 # --------------------------------------------------Network 2--------------------------------------------------
 
 resource "aws_vpc" "VPC_2" {
-  cidr_block       = "10.0.0.0/16"
+  cidr_block       = "10.1.0.0/16" # set to 10.1.0.0/16
   instance_tenancy = "default"
 }
 
@@ -218,14 +225,14 @@ resource "aws_internet_gateway" "igw_2" {
 
 resource "aws_subnet" "Public_subnet_2" {
   vpc_id                  = aws_vpc.VPC_2.id
-  cidr_block              = "10.0.11.0/24"
+  cidr_block              = "10.1.11.0/24"
   availability_zone       = "us-east-1c"
   map_public_ip_on_launch = true
 }
 
 resource "aws_subnet" "Private_subnet_2" {
   vpc_id            = aws_vpc.VPC_2.id
-  cidr_block        = "10.0.12.0/24"
+  cidr_block        = "10.1.12.0/24"
   availability_zone = "us-east-1d"
 }
 
@@ -271,7 +278,7 @@ resource "aws_network_acl" "ACL_2" {
 }
 
 resource "aws_security_group" "sg_public_2" {
-  name   = "sg_1"
+  name   = "sg_pub_2"
   vpc_id = aws_vpc.VPC_2.id
 
   ingress {
@@ -288,6 +295,13 @@ resource "aws_security_group" "sg_public_2" {
     to_port     = 80
   }
 
+  ingress {
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    from_port   = 1256
+    to_port     = 1256
+  }
+
   egress {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
@@ -298,12 +312,12 @@ resource "aws_security_group" "sg_public_2" {
 }
 
 resource "aws_security_group" "sg_private_2" {
-  name   = "sg_2"
+  name   = "sg_priv_2"
   vpc_id = aws_vpc.VPC_2.id
 
   ingress {
     protocol    = "-1"
-    cidr_blocks = ["10.0.11.0/24"]
+    cidr_blocks = ["10.1.11.0/24"]
     from_port   = 0
     to_port     = 0
   }
@@ -359,7 +373,7 @@ resource "aws_instance" "webserver_private_2" {
   subnet_id              = aws_subnet.Private_subnet_2.id
 
   tags = {
-    Name = "private_server"
+    Name = "private_server_2"
   }
 }
 
@@ -377,7 +391,7 @@ resource "aws_route_table" "PrivateRouteTable_2" {
   vpc_id = aws_vpc.VPC_2.id
 
   route {
-    cidr_block     = "10.0.12.0/24"
+    cidr_block     = "10.1.12.0/24"
     nat_gateway_id = aws_nat_gateway.MyNAT_GTW_2.id
   }
 
@@ -403,4 +417,5 @@ resource "aws_vpc_peering_connection" "foo" {
   peer_owner_id = "619639349427"
   peer_vpc_id   = aws_vpc.VPC_1.id
   vpc_id        = aws_vpc.VPC_2.id
+  auto_accept   = true
 }

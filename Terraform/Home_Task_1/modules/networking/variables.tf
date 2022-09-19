@@ -1,23 +1,21 @@
-variable "instance_type" {
-  type    = string
-  default = "t2.micro"
-}
-variable "key_name" {
-  type    = string
-  default = "TEST"
-}
-variable "instance_ami" {
-  type    = string
-  default = "ami-05fa00d4c63e32376"
-}
-variable "allow_ports" {
-  default = ["22", "80", "1256"]
-}
-variable "general_tags" {
-  description = "Tags that are applied to most of the resources"
-  type        = map(any)
-  default = {
-    Creator = "Oleksandr Stepanov"
-    Project = "Home Task"
-  }
-}
+variable "instance_type" {}
+variable "key_name" {}
+variable "instance_ami" {}
+variable "allow_ports" {}
+variable "general_tags" {}
+variable "VPC_1_instance_tenancy" {}
+variable "VPC_1_cidr_block" {}
+variable "Public_subnet_1_cidr_block" {}
+variable "Public_subnet_1_availability_zone" {}
+variable "Public_subnet_1_map_public_ip_on_launch" {}
+variable "Private_subnet_1_cidr_block" {}
+variable "Private_subnet_1_availability_zone" {}
+variable "eip_vpc" {}
+variable "VPC_2_instance_tenancy" {}
+variable "VPC_2_cidr_block" {}
+variable "Public_subnet_2_cidr_block" {}
+variable "Public_subnet_2_availability_zone" {}
+variable "Public_subnet_2_map_public_ip_on_launch" {}
+variable "Private_subnet_2_cidr_block" {}
+variable "Private_subnet_2_availability_zone" {}
+variable "eip_2_vpc" {}

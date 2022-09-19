@@ -1,0 +1,13 @@
+variable "instance_ami" {}
+variable "instance_type" {}
+variable "key_name" {}
+variable "general_tags" {}
+variable "SG_Public_1_id" {}
+variable "SG_Private_1_id" {}
+variable "SG_Public_2_id" {}
+variable "SG_Private_2_id" {}
+variable "VPC_1_Public_Subnet" {}
+variable "VPC_1_Private_Subnet" {}
+variable "VPC_2_Public_Subnet" {}
+variable "VPC_2_Private_Subnet" {}
+variable "aws_instance_associate_public_address" {}

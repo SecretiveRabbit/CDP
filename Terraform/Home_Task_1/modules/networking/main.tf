@@ -85,28 +85,28 @@ resource "aws_security_group" "sg_private" {
 
   ingress {
     protocol    = "-1"
-    cidr_blocks = ["10.0.1.0/24"]
+    cidr_blocks = ["0.0.0.0/0"] #["10.0.1.0/24"]
     from_port   = 0
     to_port     = 0
-  }
+  }/*
   ingress {
     protocol    = "icmp"
     cidr_blocks = ["0.0.0.0/0"] # try to set ["10.1.11.0/24"] later ["0.0.0.0/0"]
     from_port   = -1
     to_port     = -1
-  }
+  }*/
   egress {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
     from_port   = 0
     to_port     = 0
-  }
+  }/*
   egress {
     protocol    = "icmp"
     cidr_blocks = ["0.0.0.0/0"] # try to set ["10.1.11.0/24"] later
     from_port   = -1
     to_port     = -1
-  }
+  }*/
 }
 
 resource "aws_route" "public_route_1" {
@@ -228,28 +228,28 @@ resource "aws_security_group" "sg_private_2" {
 
   ingress {
     protocol    = "-1"
-    cidr_blocks = ["10.1.11.0/24"]
+    cidr_blocks = ["0.0.0.0/0"] #["10.1.11.0/24"]
     from_port   = 0
     to_port     = 0
-  }
+  }/*
   ingress {
     protocol    = "icmp"
     cidr_blocks = ["0.0.0.0/0"] # try to set ["10.1.11.0/24"] later
     from_port   = -1
     to_port     = -1
-  }
+  }*/
   egress {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
     from_port   = 0
     to_port     = 0
-  }
+  }/*
   egress {
     protocol    = "icmp"
     cidr_blocks = ["0.0.0.0/0"] # try to set ["10.1.11.0/24"] later
     from_port   = -1
     to_port     = -1
-  }
+  }*/
 }
 
 resource "aws_route" "public_route_2" {
@@ -287,13 +287,12 @@ resource "aws_route_table_association" "RT_for_private_2" {
 #---------------------------------------VPC Peering------------------------------------------------------
 
 resource "aws_vpc_peering_connection" "VPC_1-VPC_2" {
-  peer_owner_id = "619639349427"
+  peer_owner_id = var.vpc_peering_connection_peer_owner_id
   peer_vpc_id   = aws_vpc.VPC_2.id
   vpc_id        = aws_vpc.VPC_1.id
-#  peer_region   = "us-east-1"
-  auto_accept   = true
+  auto_accept   = var.vpc_peering_connection_auto_allow
 }
 resource "aws_vpc_peering_connection_accepter" "peering_accept" {
   vpc_peering_connection_id = aws_vpc_peering_connection.VPC_1-VPC_2.id
-  auto_accept               = true
+  auto_accept               = var.aws_vpc_peering_connection_accepter_auto_accept
 }

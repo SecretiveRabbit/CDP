@@ -19,3 +19,6 @@ variable "Public_subnet_2_map_public_ip_on_launch" {}
 variable "Private_subnet_2_cidr_block" {}
 variable "Private_subnet_2_availability_zone" {}
 variable "eip_2_vpc" {}
+variable "vpc_peering_connection_auto_allow" {}
+variable "vpc_peering_connection_peer_owner_id" {}
+variable "aws_vpc_peering_connection_accepter_auto_accept" {}

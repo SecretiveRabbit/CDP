@@ -7,6 +7,7 @@ terraform {
   }
   backend "s3" {
     bucket = "oleksandr-stepanov-hometask-1-tf-state"
+    dynamodb_table = "terraform-state-lock-dynamo"
     key    = "home-task-1/terraform.tfstate"
     region = "us-east-1"
   }
@@ -60,4 +61,16 @@ module "ec2" {
   vpc_2_public_subnet                   = module.networking.vpc_2_public_subnet
   vpc_2_private_subnet                  = module.networking.vpc_2_private_subnet
   aws_instance_associate_public_address = var.aws_instance_associate_public_address
+}
+
+resource "aws_dynamodb_table" "dynamodb-terraform-state-lock" {
+  name = "terraform-state-lock-dynamo"
+  hash_key = "LockID"
+  read_capacity = 20
+  write_capacity = 20
+
+  attribute {
+    name = "LockID"
+    type = "S"
+  }
 }

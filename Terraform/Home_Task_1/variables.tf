@@ -11,31 +11,31 @@ variable "general_tags" {
   }
 }
 #-----------------------------------networking-----------------------------------------
-variable "VPC_1_instance_tenancy" {
+variable "vpc_1_instance_tenancy" {
   type    = string
   default = "default"
 }
-variable "VPC_1_cidr_block" {
+variable "vpc_1_cidr_block" {
   type    = string
   default = "10.0.0.0/16"
 }
-variable "Public_subnet_1_cidr_block" {
+variable "public_subnet_1_cidr_block" {
   type    = string
   default = "10.0.1.0/24"
 }
-variable "Public_subnet_1_availability_zone" {
+variable "public_subnet_1_availability_zone" {
   type    = string
   default = "us-east-1a"
 }
-variable "Public_subnet_1_map_public_ip_on_launch" {
+variable "public_subnet_1_map_public_ip_on_launch" {
   type    = bool
   default = true
 }
-variable "Private_subnet_1_cidr_block" {
+variable "private_subnet_1_cidr_block" {
   type    = string
   default = "10.0.2.0/24"
 }
-variable "Private_subnet_1_availability_zone" {
+variable "private_subnet_1_availability_zone" {
   type    = string
   default = "us-east-1b"
 }
@@ -43,31 +43,31 @@ variable "eip_vpc" {
   type    = bool
   default = true
 }
-variable "VPC_2_instance_tenancy" {
+variable "vpc_2_instance_tenancy" {
   type    = string
   default = "default"
 }
-variable "VPC_2_cidr_block" {
+variable "vpc_2_cidr_block" {
   type    = string
   default = "10.1.0.0/16"
 }
-variable "Public_subnet_2_cidr_block" {
+variable "public_subnet_2_cidr_block" {
   type    = string
   default = "10.1.11.0/24"
 }
-variable "Public_subnet_2_availability_zone" {
+variable "public_subnet_2_availability_zone" {
   type    = string
   default = "us-east-1c"
 }
-variable "Public_subnet_2_map_public_ip_on_launch" {
+variable "public_subnet_2_map_public_ip_on_launch" {
   type    = bool
   default = true
 }
-variable "Private_subnet_2_cidr_block" {
+variable "private_subnet_2_cidr_block" {
   type    = string
   default = "10.1.12.0/24"
 }
-variable "Private_subnet_2_availability_zone" {
+variable "private_subnet_2_availability_zone" {
   type    = string
   default = "us-east-1d"
 }
@@ -93,5 +93,14 @@ variable "allow_ports" {
 }
 variable "aws_instance_associate_public_address" {
   type    = bool
+  default = true
+}
+variable "vpc_peering_connection_auto_allow" {
+  default = true
+}
+variable "vpc_peering_connection_peer_owner_id" {
+  default = "619639349427"
+}
+variable "aws_vpc_peering_connection_accepter_auto_accept" {
   default = true
 }

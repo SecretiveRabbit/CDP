@@ -71,7 +71,7 @@ resource "aws_network_acl" "acl_1" {
 resource "aws_security_group" "sg_public" {
   name   = "sg_pub_1"
   vpc_id = aws_vpc.vpc_1.id
-
+  /*
   dynamic "ingress" {
     for_each = var.allow_ports
     content {
@@ -81,13 +81,19 @@ resource "aws_security_group" "sg_public" {
       cidr_blocks = ["0.0.0.0/0"]
     }
   }
+  */
+  ingress {
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+    from_port   = 0
+    to_port     = 0
+  }
   egress {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
     from_port   = 0
     to_port     = 0
   }
-
 }
 
 resource "aws_security_group" "sg_private" {

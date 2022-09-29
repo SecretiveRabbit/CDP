@@ -50,3 +50,15 @@ module "asg" {
   aws_instance_associate_public_address = var.aws_instance_associate_public_address */
 
 }
+module "alb" {
+  source             = "./modules/alb"
+  alb_sg             = module.networking.alb_sg
+  asg_id             = module.asg.asg_id
+  public_subnet_1_id = module.networking.vpc_1_public_subnet
+  public_subnet_2_id = module.networking.vpc_1_public_subnet_2
+  vpc_id             = module.networking.vpc_id
+}
+
+output "alb_dns_name" {
+  value = module.asg.alb_dns_name
+}

@@ -1,55 +1,3 @@
-data "aws_ami" "amazon-linux-2" {
-  most_recent = true
-
-  filter {
-    name   = "owner-alias"
-    values = ["amazon"]
-  }
-
-  filter {
-    name   = "name"
-    values = ["amzn2-ami-hvm*"]
-  }
-}
-
-resource "aws_launch_configuration" "asg_lc" {
-  name_prefix       = "terraform_lc"
-  image_id          = data.aws_ami.amazon-linux-2.id
-  instance_type     = "t2.micro"
-  key_name          = "TEST"
-  user_data         = file("user_data.sh")
-  placement_tenancy = "default"
-  security_groups   = [var.sg_public_1_id]
-
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
-resource "aws_autoscaling_policy" "asg_policy" {
-  name                   = "asg_policy_terraform"
-  scaling_adjustment     = 1
-  adjustment_type        = "ChangeInCapacity"
-  cooldown               = 300
-  autoscaling_group_name = aws_autoscaling_group.this_asg.name
-}
-
-resource "aws_autoscaling_group" "this_asg" {
-  name                 = "asg"
-  launch_configuration = aws_launch_configuration.asg_lc.name
-  min_size             = 1
-  max_size             = 3
-  desired_capacity     = 2
-  vpc_zone_identifier  = [var.public_subnet_1_id, var.public_subnet_2_id]
-  #availability_zones = ["us-east-1a"]
-  target_group_arns = [aws_alb_target_group.this_tg.arn]
-
-  lifecycle {
-    ignore_changes = [load_balancers, target_group_arns] #[aws_lb.alb.arn, aws_alb_target_group.this_tg.arn]
-  }
-  depends_on = [aws_lb.alb]
-}
-
 #-------------------------------------application load balancer---------------------------------------
 resource "aws_lb" "alb" {
   name               = "lb-terraform"
@@ -108,6 +56,6 @@ resource "aws_lb_target_group_attachment" "ec2_attach" {
 }*/
 
 resource "aws_autoscaling_attachment" "asg_attachment_bar" {
-  autoscaling_group_name = aws_autoscaling_group.this_asg.id
+  autoscaling_group_name = var.asg_id
   lb_target_group_arn    = aws_alb_target_group.this_tg.arn
 }

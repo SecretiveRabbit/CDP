@@ -33,7 +33,7 @@ resource "aws_eip" "eip_1" {
   vpc        = var.eip_vpc
   depends_on = [aws_internet_gateway.igw]
 }
-
+/*
 resource "aws_network_acl" "acl_1" {
   vpc_id = aws_vpc.vpc_1.id
 
@@ -55,7 +55,7 @@ resource "aws_network_acl" "acl_1" {
   }
 
   tags = merge({ Name = "ACL_VPC_1" }, var.general_tags)
-}
+}*/
 
 resource "aws_security_group" "sg_public" {
   name   = "sg_pub_1"
@@ -119,7 +119,7 @@ resource "aws_route_table" "private_route_table" {
   vpc_id = aws_vpc.vpc_1.id
 
   route {
-    cidr_block     = "10.0.2.0/24"
+    cidr_block     = "0.0.0.0/0"#"10.0.2.0/24"
     nat_gateway_id = aws_nat_gateway.nat_gtw_1.id
   }
   route {
@@ -177,7 +177,7 @@ resource "aws_eip" "eip_2" {
   vpc        = var.eip_2_vpc
   depends_on = [aws_internet_gateway.igw_2]
 }
-
+/*
 resource "aws_network_acl" "acl_2" {
   vpc_id = aws_vpc.vpc_2.id
 
@@ -199,7 +199,7 @@ resource "aws_network_acl" "acl_2" {
   }
 
   tags = merge({ Name = "ACL_VPC_2" }, var.general_tags)
-}
+}*/
 
 resource "aws_security_group" "sg_public_2" {
   name   = "sg_pub_2"
@@ -262,7 +262,7 @@ resource "aws_route_table" "private_route_table_2" {
   vpc_id = aws_vpc.vpc_2.id
 
   route {
-    cidr_block     = "10.1.12.0/24"
+    cidr_block     = "0.0.0.0/0"#"10.1.12.0/24"
     nat_gateway_id = aws_nat_gateway.nat_gtw_2.id
   }
 
@@ -296,3 +296,5 @@ resource "aws_vpc_peering_connection_accepter" "peering_accept" {
   vpc_peering_connection_id = aws_vpc_peering_connection.vpc_1_vpc_2.id
   auto_accept               = var.aws_vpc_peering_connection_accepter_auto_accept
 }
+
+

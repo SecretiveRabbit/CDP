@@ -6,10 +6,24 @@ terraform {
   }
 }
 
-provider "aws" {
-  region = "us-east-1"
+resource "aws_dynamodb_table" "dynamodb-terraform-state-lock-home-task-2" {
+  name           = "terraform-state-lock-dynamo-home-task-2"
+  hash_key       = "LockID"
+  read_capacity  = 20
+  write_capacity = 20
+
+  attribute {
+    name = "LockID"
+    type = "S"
+  }
 }
 
+/*
+resource "null_resource" "start-time" {
+  provisioner "local-exec" {
+    command = "echo 'The apply started in $(date)' >> start-time.txt"
+  }
+}*/
 module "networking" {
   source                                  = "./modules/networking"
   allow_ports                             = var.allow_ports
@@ -28,7 +42,6 @@ module "networking" {
   public_subnet_2_availability_zone       = var.public_subnet_2_availability_zone
 }
 
-
 module "asg" {
   source              = "./modules/asg"
   public_subnet_1_id  = module.networking.vpc_1_public_subnet
@@ -39,17 +52,8 @@ module "asg" {
   alb_sg              = module.networking.alb_sg
   vpc_id              = module.networking.vpc_id
 
-  /*instance_ami                          = var.instance_ami
-  instance_type                         = var.instance_type
-  key_name                              = var.key_name
-  general_tags                          = var.general_tags
-  sg_public_1_id                        = module.networking.sg_public_1_id
-  sg_private_1_id                       = module.networking.sg_private_1_id
-  vpc_1_public_subnet                   = module.networking.vpc_1_public_subnet
-  vpc_1_private_subnet                  = module.networking.vpc_1_private_subnet
-  aws_instance_associate_public_address = var.aws_instance_associate_public_address */
-
 }
+
 module "alb" {
   source             = "./modules/alb"
   alb_sg             = module.networking.alb_sg
@@ -58,7 +62,16 @@ module "alb" {
   public_subnet_2_id = module.networking.vpc_1_public_subnet_2
   vpc_id             = module.networking.vpc_id
 }
-
-output "alb_dns_name" {
-  value = module.asg.alb_dns_name
+/*
+resource "null_resource" "terraform_fmt" {
+  provisioner "local-exec" {
+    command = "terraform fmt"
+  }
 }
+
+resource "null_resource" "end-time" {
+  provisioner "local-exec" {
+    command = "echo 'The apply finished at $(date)' >> start-time.txt"
+  }
+}
+*/

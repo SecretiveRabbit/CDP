@@ -83,10 +83,10 @@ resource "aws_security_group" "sg_public" {
   }
   */
   ingress {
-    protocol    = "-1"
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
-    from_port   = 0
-    to_port     = 0
+    from_port   = 80
+    to_port     = 80
   }
   egress {
     protocol    = "-1"
@@ -101,29 +101,20 @@ resource "aws_security_group" "sg_private" {
   vpc_id = aws_vpc.vpc_1.id
 
   ingress {
-    protocol    = "-1"
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"] #["10.0.1.0/24"]
-    from_port   = 0
-    to_port     = 0
-  } /*
-  ingress {
-    protocol    = "icmp"
-    cidr_blocks = ["0.0.0.0/0"] # try to set ["10.1.11.0/24"] later ["0.0.0.0/0"]
-    from_port   = -1
-    to_port     = -1
-  }*/
+    from_port   = 80
+    to_port     = 80
+  }
+
   egress {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
     from_port   = 0
     to_port     = 0
-  } /*
-  egress {
-    protocol    = "icmp"
-    cidr_blocks = ["0.0.0.0/0"] # try to set ["10.1.11.0/24"] later
-    from_port   = -1
-    to_port     = -1
-  }*/
+  }
+
+
 }
 
 resource "aws_route" "public_route_1" {
@@ -136,12 +127,7 @@ resource "aws_route_table" "private_route_table" {
   vpc_id = aws_vpc.vpc_1.id
 
   route {
-    cidr_block     = "10.0.2.0/24"
-    nat_gateway_id = aws_nat_gateway.nat_gtw_1.id
-  }
-
-  route {
-    cidr_block     = "10.0.2.0/24"
+    cidr_block     = "0.0.0.0/0"
     nat_gateway_id = aws_nat_gateway.nat_gtw_1.id
   }
 
@@ -153,9 +139,18 @@ resource "aws_route_table_association" "rt_for_public" {
   route_table_id = aws_vpc.vpc_1.default_route_table_id
 }
 
+resource "aws_route_table_association" "rt_for_public_2" {
+  subnet_id      = aws_subnet.public_subnet_2.id
+  route_table_id = aws_vpc.vpc_1.default_route_table_id
+}
 
 resource "aws_route_table_association" "rt_for_private" {
   subnet_id      = aws_subnet.private_subnet_1.id
+  route_table_id = aws_route_table.private_route_table.id
+}
+
+resource "aws_route_table_association" "rt_for_private_2" {
+  subnet_id      = aws_subnet.private_subnet_2.id
   route_table_id = aws_route_table.private_route_table.id
 }
 
@@ -164,26 +159,21 @@ resource "aws_security_group" "alb" {
   name        = "terraform_alb_security_group"
   description = "Terraform load balancer security group"
   vpc_id      = aws_vpc.vpc_1.id
-
+  /*
   ingress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
-  } /*
-  ingress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+  }*/
 
   ingress {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
-  }*/
+  }
+
   egress {
     from_port   = 0
     to_port     = 0

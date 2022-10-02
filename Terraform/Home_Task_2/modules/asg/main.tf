@@ -37,10 +37,10 @@ resource "aws_autoscaling_policy" "asg_policy" {
 resource "aws_autoscaling_group" "this_asg" {
   name                 = "asg"
   launch_configuration = aws_launch_configuration.asg_lc.name
-  min_size             = 1
-  max_size             = 3
+  min_size             = 2
+  max_size             = 4
   desired_capacity     = 2
-  vpc_zone_identifier  = [var.public_subnet_1_id, var.public_subnet_2_id]
+  vpc_zone_identifier  = [var.private_subnet_1_id, var.private_subnet_2_id]
   #availability_zones = ["us-east-1a"]
   target_group_arns = [aws_alb_target_group.this_tg.arn]
 

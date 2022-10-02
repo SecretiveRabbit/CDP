@@ -1,4 +1,5 @@
 #-----------------------------------general---------------------------------------------
+
 variable "region" {
   type    = string
   default = "us-east-1"
@@ -34,7 +35,7 @@ variable "public_subnet_2_cidr_block" {
 }
 variable "public_subnet_2_availability_zone" {
   type    = string
-  default = "us-east-1c"
+  default = "us-east-1b"
 }
 variable "public_subnet_1_map_public_ip_on_launch" {
   type    = bool
@@ -46,11 +47,11 @@ variable "private_subnet_1_cidr_block" {
 }
 variable "private_subnet_1_availability_zone" {
   type    = string
-  default = "us-east-1b"
+  default = "us-east-1a"
 }
 variable "private_subnet_2_availability_zone" {
   type    = string
-  default = "us-east-1d"
+  default = "us-east-1b"
 }
 variable "private_subnet_2_cidr_block" {
   type    = string

@@ -111,3 +111,5 @@ resource "aws_autoscaling_attachment" "asg_attachment_bar" {
   autoscaling_group_name = aws_autoscaling_group.this_asg.id
   lb_target_group_arn    = aws_alb_target_group.this_tg.arn
 }
+
+

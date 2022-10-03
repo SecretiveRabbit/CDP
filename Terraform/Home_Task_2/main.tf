@@ -6,6 +6,7 @@ terraform {
   }
 }
 
+
 resource "aws_dynamodb_table" "dynamodb-terraform-state-lock-home-task-2" {
   name           = "terraform-state-lock-dynamo-home-task-2"
   hash_key       = "LockID"

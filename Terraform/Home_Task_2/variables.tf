@@ -12,7 +12,9 @@ variable "general_tags" {
     Project = "Home Task"
   }
 }
+
 #----------------------------------networking-----------------------------------------
+
 variable "vpc_1_instance_tenancy" {
   type    = string
   default = "default"

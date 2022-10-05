@@ -13,18 +13,19 @@ data "aws_ami" "amazon-linux-2" {
 
 }
 
-resource "aws_launch_configuration" "asg_lc" {
-  name_prefix       = "terraform_lc"
-  image_id          = data.aws_ami.amazon-linux-2.id
-  instance_type     = "t2.micro"
-  key_name          = "TEST"
-  user_data         = file("user_data.sh")
-  placement_tenancy = "default"
-  security_groups   = [var.sg_public_1_id]
+data "aws_ssm_parameter" "key_pair" {
+  name = "TEST"
+}
 
-  lifecycle {
-    create_before_destroy = true
-  }
+resource "aws_launch_configuration" "asg_lc" {
+  name_prefix     = "terraform_lc"
+  image_id        = data.aws_ami.amazon-linux-2.id
+  instance_type   = "t2.micro"
+  key_name        = data.aws_ssm_parameter.key_pair.name
+  user_data       = file("${path.module}/user_data.sh")
+  security_groups = [aws_security_group.sg_private.id]
+
+  depends_on = [var.nat_gtw_1]
 }
 
 resource "aws_autoscaling_policy" "asg_policy" {
@@ -42,73 +43,52 @@ resource "aws_autoscaling_group" "this_asg" {
   max_size             = 4
   desired_capacity     = 2
   vpc_zone_identifier  = [var.private_subnet_1_id, var.private_subnet_2_id]
-  #availability_zones = ["us-east-1a"]
-  target_group_arns = [aws_alb_target_group.this_tg.arn]
-
-  lifecycle {
-    ignore_changes = [load_balancers, target_group_arns] #[aws_lb.alb.arn, aws_alb_target_group.this_tg.arn]
-  }
-  depends_on = [aws_lb.alb]
 }
-
-#-------------------------------------application load balancer---------------------------------------
-resource "aws_lb" "alb" {
-  name               = "lb-terraform"
-  internal           = false
-  load_balancer_type = "application"
-  ip_address_type    = "ipv4"
-  security_groups    = [var.alb_sg]
-  subnets            = [var.public_subnet_1_id, var.public_subnet_2_id]
-
-  enable_deletion_protection = false
-  /*
-  access_logs {
-    bucket  = aws_s3_bucket.lb_logs.bucket
-    prefix  = "test-lb"
-    enabled = true
-  }
-*/
-  tags = {
-    Environment = "production"
-    Name        = "alb"
-  }
-}
-
-resource "aws_alb_target_group" "this_tg" {
-  name        = "terraform-alb-target"
-  port        = 80
-  protocol    = "HTTP"
-  vpc_id      = var.vpc_id
-  target_type = "instance"
-  stickiness {
-    type = "lb_cookie"
-  }
-  health_check {
-    path                = "/index.html"
-    port                = 80
-    protocol            = "HTTP"
-    timeout             = 5
-    healthy_threshold   = 5
-    unhealthy_threshold = 2
-  }
-}
-
-resource "aws_alb_listener" "listener_http" {
-  load_balancer_arn = aws_lb.alb.arn
-  port              = "80"
-  protocol          = "HTTP"
-
-  default_action {
-    target_group_arn = aws_alb_target_group.this_tg.arn
-    type             = "forward"
-  }
-} /*
-resource "aws_lb_target_group_attachment" "ec2_attach" {
-  target_group_arn = aws_alb_target_group.this_tg.arn
-  target_id        = aws_autoscaling_group.this_asg.id # what to set? alb_arn
-}*/
 
 resource "aws_autoscaling_attachment" "asg_attachment_bar" {
   autoscaling_group_name = aws_autoscaling_group.this_asg.id
-  lb_target_group_arn    = aws_alb_target_group.this_tg.arn
+  lb_target_group_arn    = var.tg_arn
+}
+
+resource "aws_security_group" "sg_public" {
+  name   = "sg_pub_1"
+  vpc_id = var.vpc_id
+
+  ingress {
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    from_port   = 22
+    to_port     = 22
+  }
+  egress {
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+    from_port   = 0
+    to_port     = 0
+  }
+}
+
+resource "aws_security_group" "sg_private" {
+  name   = "sg_priv_1"
+  vpc_id = var.vpc_id
+
+  ingress {
+    protocol = "tcp"
+    #cidr_blocks = ["0.0.0.0/0"] #["10.0.1.0/24"]
+    security_groups = [aws_security_group.sg_public.id]
+    from_port       = 80
+    to_port         = 80
+  }
+  ingress {
+    from_port       = 0
+    to_port         = 0
+    protocol        = "-1"
+    security_groups = [var.alb_sg]
+  }
+  egress {
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+    from_port   = 0
+    to_port     = 0
+  }
 }

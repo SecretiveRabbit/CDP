@@ -49,15 +49,14 @@ module "asg" {
   private_subnet_1_id = module.networking.vpc_1_private_subnet
   public_subnet_2_id  = module.networking.vpc_1_public_subnet_2
   private_subnet_2_id = module.networking.vpc_1_private_subnet_2
-  sg_public_1_id      = module.networking.sg_public_1_id
-  alb_sg              = module.networking.alb_sg
   vpc_id              = module.networking.vpc_id
-
+  nat_gtw_1           = module.networking.nat_gtw_1
+  tg_arn              = module.alb.tg_arn
+  alb_sg              = module.alb.alb_sg
 }
 
 module "alb" {
   source             = "./modules/alb"
-  alb_sg             = module.networking.alb_sg
   asg_id             = module.asg.asg_id
   public_subnet_1_id = module.networking.vpc_1_public_subnet
   public_subnet_2_id = module.networking.vpc_1_public_subnet_2

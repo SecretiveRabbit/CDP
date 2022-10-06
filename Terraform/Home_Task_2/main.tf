@@ -44,15 +44,28 @@ module "networking" {
 }
 
 module "asg" {
-  source              = "./modules/asg"
-  public_subnet_1_id  = module.networking.vpc_1_public_subnet
-  private_subnet_1_id = module.networking.vpc_1_private_subnet
-  public_subnet_2_id  = module.networking.vpc_1_public_subnet_2
-  private_subnet_2_id = module.networking.vpc_1_private_subnet_2
-  vpc_id              = module.networking.vpc_id
-  nat_gtw_1           = module.networking.nat_gtw_1
-  tg_arn              = module.alb.tg_arn
-  alb_sg              = module.alb.alb_sg
+  source                    = "./modules/asg"
+  public_subnet_1_id        = module.networking.vpc_1_public_subnet
+  private_subnet_1_id       = module.networking.vpc_1_private_subnet
+  public_subnet_2_id        = module.networking.vpc_1_public_subnet_2
+  private_subnet_2_id       = module.networking.vpc_1_private_subnet_2
+  vpc_id                    = module.networking.vpc_id
+  nat_gtw_1                 = module.networking.nat_gtw_1
+  tg_arn                    = module.alb.tg_arn
+  alb_sg                    = module.alb.alb_sg
+  asg_min_size              = var.asg_min_size
+  asg_desired_capacity      = var.asg_desired_capacity
+  asg_max_size              = var.asg_max_size
+  pub_sg_cidr_for_asg       = var.pub_sg_cidr_for_asg
+  priv_sg_ingress_from_port = var.priv_sg_ingress_from_port
+  priv_sg_ingress_to_port   = var.priv_sg_ingress_to_port
+  priv_sg_egress_to_port    = var.priv_sg_egress_to_port
+  priv_sg_egress_from_port  = var.priv_sg_egress_from_port
+  pub_sg_egress_from_port   = var.pub_sg_egress_from_port
+  pub_sg_egress_to_port     = var.pub_sg_egress_to_port
+  pub_sg_ingress_from_port  = var.pub_sg_ingress_from_port
+  pub_sg_ingress_to_port    = var.pub_sg_ingress_to_port
+  priv_sg_cidr_for_asg      = var.priv_sg_cidr_for_asg
 }
 
 module "alb" {
@@ -61,6 +74,7 @@ module "alb" {
   public_subnet_1_id = module.networking.vpc_1_public_subnet
   public_subnet_2_id = module.networking.vpc_1_public_subnet_2
   vpc_id             = module.networking.vpc_id
+  alb_target_port    = var.alb_target_port
 }
 /*
 resource "null_resource" "end-time" {

@@ -6,3 +6,24 @@ variable "vpc_id" {}
 variable "nat_gtw_1" {}
 variable "tg_arn" {}
 variable "alb_sg" {}
+variable "asg_min_size" {}
+variable "asg_desired_capacity" {}
+variable "asg_max_size" {}
+variable "pub_sg_cidr_for_asg" {}
+variable "priv_sg_ingress_from_port" {}
+variable "priv_sg_ingress_to_port" {}
+variable "priv_sg_egress_from_port" {}
+variable "priv_sg_egress_to_port" {}
+variable "asg_scaling_adjustment" {
+  type    = number
+  default = 1
+}
+variable "asg_cooldown" {
+  type    = number
+  default = 300
+}
+variable "pub_sg_ingress_from_port" {}
+variable "pub_sg_ingress_to_port" {}
+variable "pub_sg_egress_from_port" {}
+variable "pub_sg_egress_to_port" {}
+variable "priv_sg_cidr_for_asg" {}

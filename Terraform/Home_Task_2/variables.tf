@@ -82,3 +82,65 @@ variable "instance_ami" {
   type    = string
   default = "ami-05fa00d4c63e32376"
 }
+
+#-------------------------------------------alb---------------------------------------------
+variable "alb_target_port" {
+  type    = string
+  default = "80"
+}
+
+#-------------------------------------------asg---------------------------------------------
+variable "asg_min_size" {
+  type    = number
+  default = 2
+}
+variable "asg_desired_capacity" {
+  type    = number
+  default = 2
+}
+variable "asg_max_size" {
+  type    = number
+  default = 3
+}
+variable "pub_sg_cidr_for_asg" {
+  description = "CIDR block for public subnet"
+  type        = list(string)
+  default     = ["0.0.0.0/0"]
+}
+variable "pub_sg_ingress_from_port" {
+  type    = number
+  default = 22
+}
+variable "pub_sg_ingress_to_port" {
+  type    = number
+  default = 22
+}
+variable "pub_sg_egress_from_port" {
+  type    = number
+  default = 0
+}
+variable "pub_sg_egress_to_port" {
+  type    = number
+  default = 0
+}
+variable "priv_sg_ingress_from_port" {
+  type    = number
+  default = 80
+}
+variable "priv_sg_ingress_to_port" {
+  type    = number
+  default = 80
+}
+variable "priv_sg_egress_from_port" {
+  type    = number
+  default = 0
+}
+variable "priv_sg_egress_to_port" {
+  type    = number
+  default = 0
+}
+variable "priv_sg_cidr_for_asg" {
+  description = "CIDR block for public subnet"
+  type        = list(string)
+  default     = ["0.0.0.0/0"]
+}

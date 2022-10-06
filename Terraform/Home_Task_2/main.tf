@@ -1,0 +1,85 @@
+terraform {
+  backend "s3" {
+    region = "us-east-1"
+    bucket = "oleksandr-stepanov-hometask-2-tf-state"
+    key    = "Home_Task_1/terraform.tfstate"
+  }
+}
+
+resource "aws_dynamodb_table" "dynamodb-terraform-state-lock-home-task-2" {
+  name           = "terraform-state-lock-dynamo-home-task-2"
+  hash_key       = "LockID"
+  read_capacity  = 20
+  write_capacity = 20
+
+  attribute {
+    name = "LockID"
+    type = "S"
+  }
+}
+
+/*
+resource "null_resource" "start-time" {
+  provisioner "local-exec" {
+    command = "echo 'The apply started in $(date)' >> start-time.txt"
+  }
+}*/
+
+module "networking" {
+  source                                  = "./modules/networking"
+  allow_ports                             = var.allow_ports
+  general_tags                            = var.general_tags
+  vpc_1_instance_tenancy                  = var.vpc_1_instance_tenancy
+  vpc_1_cidr_block                        = var.vpc_1_cidr_block
+  public_subnet_1_cidr_block              = var.public_subnet_1_cidr_block
+  public_subnet_1_availability_zone       = var.public_subnet_1_availability_zone
+  public_subnet_1_map_public_ip_on_launch = var.public_subnet_1_map_public_ip_on_launch
+  private_subnet_1_cidr_block             = var.private_subnet_1_cidr_block
+  private_subnet_1_availability_zone      = var.private_subnet_1_availability_zone
+  eip_vpc                                 = var.eip_vpc
+  public_subnet_2_cidr_block              = var.public_subnet_2_cidr_block
+  private_subnet_2_availability_zone      = var.private_subnet_2_availability_zone
+  private_subnet_2_cidr_block             = var.private_subnet_2_cidr_block
+  public_subnet_2_availability_zone       = var.public_subnet_2_availability_zone
+}
+
+module "asg" {
+  source                    = "./modules/asg"
+  public_subnet_1_id        = module.networking.vpc_1_public_subnet
+  private_subnet_1_id       = module.networking.vpc_1_private_subnet
+  public_subnet_2_id        = module.networking.vpc_1_public_subnet_2
+  private_subnet_2_id       = module.networking.vpc_1_private_subnet_2
+  vpc_id                    = module.networking.vpc_id
+  nat_gtw_1                 = module.networking.nat_gtw_1
+  tg_arn                    = module.alb.tg_arn
+  alb_sg                    = module.alb.alb_sg
+  asg_min_size              = var.asg_min_size
+  asg_desired_capacity      = var.asg_desired_capacity
+  asg_max_size              = var.asg_max_size
+  pub_sg_cidr_for_asg       = var.pub_sg_cidr_for_asg
+  priv_sg_ingress_from_port = var.priv_sg_ingress_from_port
+  priv_sg_ingress_to_port   = var.priv_sg_ingress_to_port
+  priv_sg_egress_to_port    = var.priv_sg_egress_to_port
+  priv_sg_egress_from_port  = var.priv_sg_egress_from_port
+  pub_sg_egress_from_port   = var.pub_sg_egress_from_port
+  pub_sg_egress_to_port     = var.pub_sg_egress_to_port
+  pub_sg_ingress_from_port  = var.pub_sg_ingress_from_port
+  pub_sg_ingress_to_port    = var.pub_sg_ingress_to_port
+  priv_sg_cidr_for_asg      = var.priv_sg_cidr_for_asg
+}
+
+module "alb" {
+  source             = "./modules/alb"
+  asg_id             = module.asg.asg_id
+  public_subnet_1_id = module.networking.vpc_1_public_subnet
+  public_subnet_2_id = module.networking.vpc_1_public_subnet_2
+  vpc_id             = module.networking.vpc_id
+  alb_target_port    = var.alb_target_port
+}
+/*
+resource "null_resource" "end-time" {
+  provisioner "local-exec" {
+    command = "echo 'The apply finished at $(date)' >> start-time.txt"
+  }
+}
+*/

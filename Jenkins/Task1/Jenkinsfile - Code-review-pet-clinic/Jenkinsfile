@@ -1,0 +1,45 @@
+pipeline {
+    agent { label 'centos' }
+    stages {
+        stage('Git clone') {
+            steps {
+                git credentialsId: 'github_key', url: 'https://github.com/SecretiveRabbit/pet-clinic', branch: '${branch}'
+            }
+        }
+        stage('Maven clean') {
+            steps {
+                echo 'Cleaning garbage...'
+                sh 'mvn clean'
+            }
+        }
+		stage('Maven compile') {
+		    steps {
+			    echo 'Building new Maven...'
+				sh 'mvn compile'
+		    }
+		}
+		stage('Maven test') {
+            steps {
+                echo 'Testing...'
+                sh 'mvn test'
+            }
+        }
+        stage('Maven build') {
+            steps {
+                echo 'Building...'
+                sh 'mvn package'
+            }
+        }
+        stage('Using Hadolint') {
+            steps {
+                echo 'Launching Hadolint...'
+                sh 'hadolint Dockerfile'
+            }
+        }
+        stage ('Starting Build-pet-clinic job') {
+            steps {
+                build job: 'Deploy-pet-clinic'
+            }
+        }
+    }
+}

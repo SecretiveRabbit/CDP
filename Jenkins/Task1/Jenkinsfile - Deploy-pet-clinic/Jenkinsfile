@@ -1,0 +1,10 @@
+pipeline {
+    agent { label 'centos' }
+    stages {
+        stage('Docker run') {
+            steps {
+                sh 'docker container run -d --name pet-clinic oleksandrstepanov1/build_pet_clinic:latest'
+            }
+        }
+    }
+}

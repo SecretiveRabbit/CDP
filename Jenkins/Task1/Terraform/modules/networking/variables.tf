@@ -1,0 +1,10 @@
+variable "instance_type" {}
+variable "key_name" {}
+variable "instance_ami" {}
+variable "allow_ports" {}
+variable "general_tags" {}
+variable "vpc_1_instance_tenancy" {}
+variable "vpc_1_cidr_block" {}
+variable "public_subnet_1_cidr_block" {}
+variable "public_subnet_1_availability_zone" {}
+variable "public_subnet_1_map_public_ip_on_launch" {}

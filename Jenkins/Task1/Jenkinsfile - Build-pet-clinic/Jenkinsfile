@@ -1,0 +1,62 @@
+pipeline {
+    agent { label 'centos' }
+    environment {
+        DOCKER_IMAGE_NAME = "oleksandrstepanov1/build_pet_clinic"
+    }
+    stages {
+        stage('Git clone') {
+            steps {
+                git credentialsId: 'github_key', url: 'https://github.com/SecretiveRabbit/pet-clinic', branch: '${branch}'
+            }
+        }
+        stage('Maven clean') {
+            steps {
+                echo 'Cleaning garbage'
+                sh 'mvn clean'
+            }
+        }
+		stage('Maven compile') {
+		    steps {
+			    echo 'Building new Maven'
+				sh 'mvn compile'
+		    }
+		}
+		stage('Maven test') {
+            steps {
+                echo 'Testing'
+                sh 'mvn test'
+            }
+        }
+        stage('Maven build') {
+            steps {
+                echo 'Testing'
+                sh 'mvn package'
+            }
+        }
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    app = docker.build(DOCKER_IMAGE_NAME)
+                    app.inside {
+                        sh 'echo Hello, World!'
+                    }
+                }
+            }
+        }
+        stage('Push Docker Image') {
+            steps {
+                script {
+                    docker.withRegistry('https://registry.hub.docker.com', 'docker_hub_login') {
+                        app.push("${env.BUILD_NUMBER}")
+                        app.push("latest")
+                    }
+                }
+            }
+        }
+        stage ('Starting Build-pet-clinic job') {
+            steps {
+                build job: 'Code-review-pet-clinic', parameters: [[$class: 'StringParameterValue', name: 'branch', value: 'main']]
+            }
+        }
+    }
+}

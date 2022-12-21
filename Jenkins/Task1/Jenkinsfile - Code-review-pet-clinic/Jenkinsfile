@@ -1,0 +1,53 @@
+properties([[$class: 'BuildDiscarderProperty', strategy: [$class: 'LogRotator', artifactDaysToKeepStr: '', artifactNumToKeepStr: '10', daysToKeepStr: '', numToKeepStr: '10']]]);
+def branch = "main"
+def git_url = "https://github.com/SecretiveRabbit/pet-clinic"
+pipeline {
+    agent { label 'centos' }
+    stages {
+        stage('Git clone') {
+            steps {
+			    properties([pipelineTriggers([[$class: 'GitHubPushTrigger']])])
+                git credentialsId: 'github_key', url: '${git_url}', branch: '${branch}'
+            }
+        }
+        stage('Maven clean') {
+            steps {
+                echo 'Cleaning garbage...'
+                sh 'mvn clean'
+            }
+        }
+		stage('Maven compile') {
+		    steps {
+			    echo 'Building new Maven...'
+				sh 'mvn compile'
+		    }
+		}
+		stage('Maven test') {
+            steps {
+                echo 'Testing...'
+                sh 'mvn test'
+            }
+        }
+        stage('Using Hadolint') {
+            steps {
+                echo 'Launching Hadolint...'
+                sh 'hadolint Dockerfile'
+            }
+        }
+		stage ("Deleting working directory") {
+		    steps {
+			    deleteDir()
+			}
+		}
+        stage ('Starting Build-pet-clinic job') {
+            steps {
+                build job: 'Build-pet-clinic'
+            }
+        }
+    }
+	post {
+	    always {
+		    cleanWs()
+		}	
+	}
+}

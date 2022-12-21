@@ -1,0 +1,76 @@
+pipeline {
+    agent { label 'k8s' }
+    environment {
+        DOCKER_IMAGE_NAME = "oleksandrstepanov1/build_pet_clinic"
+    }
+    podTemplate(containers: [
+            containerTemplate(name: 'maven', image: 'oleksandrstepanov1/k8stemplate', command: 'sleep', args: '99d')
+    ])
+    stages {
+        stage('Initial setup') {
+            steps {
+                sh'''
+                apt update -y; apt install -y default-jdk
+                apt update -y ; apt install -y maven
+                apt-get update -y ; apt-get install -y git
+                git config --global user.name "SecretiveRabbit"
+                git config --global user.email "sanya21911@gmail.com"
+                '''
+            }
+        }
+        stage('Git clone') {
+            steps {
+                git credentialsId: 'github_key', url: 'https://github.com/SecretiveRabbit/pet-clinic', branch: '${branch}'
+            }
+        }
+        stage('Maven clean') {
+            steps {
+                echo 'Cleaning garbage'
+                sh 'mvn clean'
+            }
+        }
+		stage('Maven compile') {
+		    steps {
+			    echo 'Building new Maven'
+				sh 'mvn compile'
+		    }
+		}
+		stage('Maven test') {
+            steps {
+                echo 'Testing'
+                sh 'mvn test'
+            }
+        }
+        stage('Maven build') {
+            steps {
+                echo 'Testing'
+                sh 'mvn package'
+            }
+        }
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    app = docker.build(DOCKER_IMAGE_NAME)
+                    app.inside {
+                        sh 'echo Hello, World!'
+                    }
+                }
+            }
+        }
+        stage('Push Docker Image') {
+            steps {
+                script {
+                    docker.withRegistry('https://registry.hub.docker.com', 'docker_hub_login') {
+                        app.push("${env.BUILD_NUMBER}")
+                        app.push("latest")
+                    }
+                }
+            }
+        }
+        stage ('Starting Build-pet-clinic job') {
+            steps {
+                build job: 'Code-review-pet-clinic', parameters: [[$class: 'StringParameterValue', name: 'branch', value: 'main']]
+            }
+        }
+    }
+}
